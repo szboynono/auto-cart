@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import puppeteer from "puppeteer";
 import nodemailer from "nodemailer";
-import schedule from 'node-schedule';
+import schedule from "node-schedule";
 
 dotenv.config();
 
@@ -34,7 +34,7 @@ const sendEmail = async (html: string) => {
 const run = async () => {
   const browser = await puppeteer.launch({
     headless: true,
-    args: ["--no-sandbox"],
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
   const page = await browser.newPage();
   console.log("go to the page");
@@ -52,7 +52,7 @@ const run = async () => {
   const hitList = [];
   wishList.forEach((name: string) => {
     bags.forEach((bag: string) => {
-      if(bag.toLowerCase().includes(name.toLowerCase())){
+      if (bag.toLowerCase().includes(name.toLowerCase())) {
         hitList.push(bag);
       }
     });
@@ -62,11 +62,11 @@ const run = async () => {
   if (!hitList) return;
 
   // write up the email
-  const contentArr = ['<h1>Hit! These bags are ready!</h1>'];
-  hitList.forEach(el => {
-    contentArr.push(`<p>${el}</p>`)
+  const contentArr = ["<h1>Hit! These bags are ready!</h1>"];
+  hitList.forEach((el) => {
+    contentArr.push(`<p>${el}</p>`);
   });
   // sendEmail(contentArr.join(''));
 };
 
-schedule.scheduleJob('*/5 * * * *', () => run());
+schedule.scheduleJob("*/5 * * * *", () => run());
