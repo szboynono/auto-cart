@@ -66,7 +66,7 @@ const run = async () => {
   hitList.forEach((el) => {
     contentArr.push(`<p>${el}</p>`);
   });
-  // sendEmail(contentArr.join(''));
+  sendEmail(contentArr.join(''));
 };
 
 schedule.scheduleJob("*/5 * * * *", () => run());
