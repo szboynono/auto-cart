@@ -2,10 +2,12 @@ import dotenv from "dotenv";
 import puppeteer from "puppeteer";
 import nodemailer from "nodemailer";
 import schedule from "node-schedule";
-import express from "express";
 
-const app = express();
-const port = 3000;
+const delay = (time) => {
+  return new Promise(function(resolve) { 
+      setTimeout(resolve, time)
+  });
+}
 
 dotenv.config();
 
@@ -46,12 +48,14 @@ const run = async () => {
     "https://www.hermes.com/ca/en/category/women/bags-and-small-leather-goods/bags-and-clutches/#|",
     { waitUntil: "networkidle2" }
   );
+  await delay(1000);
   const bagsRef = await page.$$(".product-item-name");
   const bags = await Promise.all(
     bagsRef.map((elRef) =>
       page.evaluate((element) => element.textContent, elRef)
     )
   );
+  console.log('bags', bags);
   const wishList = ["Lindy", "Trim", "Medor"];
   const hitList = [];
   wishList.forEach((name: string) => {
@@ -61,20 +65,15 @@ const run = async () => {
       }
     });
   });
-  console.log(hitList);
   await browser.close();
   if (!hitList) return;
-
+  console.log('HIT!', hitList);
   // write up the email
-  const contentArr = ["<h1>Hit! These bags are ready!</h1>"];
+  const contentArr = [`<h1>Hit! These bags are ready!</h1><a href="https://www.hermes.com/ca/en/category/women/bags-and-small-leather-goods/bags-and-clutches/#|">Get it here!</a>`];
   hitList.forEach((el) => {
     contentArr.push(`<p>${el}</p>`);
   });
-  sendEmail(contentArr.join(""));
+  // sendEmail(contentArr.join(''));
 };
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Our app is running on port ${ PORT }`);
-    schedule.scheduleJob("*/5 * * * *", () => run());
-});
+schedule.scheduleJob("*/30 * * * *", () => run());
