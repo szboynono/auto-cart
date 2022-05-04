@@ -2,6 +2,10 @@ import dotenv from "dotenv";
 import puppeteer from "puppeteer";
 import nodemailer from "nodemailer";
 import schedule from "node-schedule";
+import express from "express";
+
+const app = express();
+const port = 3000;
 
 dotenv.config();
 
@@ -66,7 +70,11 @@ const run = async () => {
   hitList.forEach((el) => {
     contentArr.push(`<p>${el}</p>`);
   });
-  sendEmail(contentArr.join(''));
+  sendEmail(contentArr.join(""));
 };
 
-schedule.scheduleJob("*/5 * * * *", () => run());
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Our app is running on port ${ PORT }`);
+    schedule.scheduleJob("*/5 * * * *", () => run());
+});
